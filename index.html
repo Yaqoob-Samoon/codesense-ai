@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeSense AI | Enterprise Reviewer</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="modal-apikey" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Welcome to CodeSense AI</h2>
+            <p class="modal-desc">Powered by <strong>Google Gemini Free Tier</strong>.</p>
+            <div class="input-group">
+                <label>GEMINI API KEY</label>
+                <input type="password" id="api-key-input" class="input-styled" placeholder="AIzaSy...">
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" style="font-size: 12px; margin-top: 8px; color: var(--primary); display:inline-block;">Get Free Key from Google AI Studio &rarr;</a>
+            </div>
+            <button id="save-key-btn" class="btn btn-primary" style="width: 100%; justify-content: center;">Initialize Engine</button>
+        </div>
+    </div>
+
+    <div id="modal-settings" class="modal-overlay">
+        <div class="modal-content" style="max-width: 600px;">
+            <h2 class="modal-title">Engine Settings</h2>
+            
+            <div class="input-group">
+                <label>GEMINI API KEY</label>
+                <input type="password" id="settings-api-key" class="input-styled">
+            </div>
+
+            <div class="input-group">
+                <label>COMPANY STANDARDS (RAG CONTEXT)</label>
+                <p style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">
+                    Define custom coding guidelines (e.g., "Always use async/await", "Enforce strict TypeScript types"). The AI will read these and enforce them in every review.
+                </p>
+                <textarea id="settings-guidelines" class="input-styled" style="height: 120px; resize: vertical;" placeholder="Enter specific company rules here..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="document.getElementById('modal-settings').classList.remove('active')">Cancel</button>
+                <button id="save-settings-btn" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <header id="navbar">
+        <div class="brand">
+            <button class="icon-btn" id="toggle-sidebar" title="Toggle History">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+            <div class="logo-text">CodeSense<span class="logo-accent">AI</span></div>
+            <div class="pro-badge">GEMINI 2.5 ENGINE</div>
+        </div>
+        <div class="nav-actions">
+            <select id="lang-select" class="select-styled">
+                <option value="auto">Auto-Detect</option>
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+            </select>
+            <button class="icon-btn" onclick="document.getElementById('modal-settings').classList.add('active')" title="Settings">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <div id="app">
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <span style="font-size: 12px; font-weight: 600; color: var(--muted);">REVIEW HISTORY</span>
+                <button class="icon-btn" id="clear-history">Clear</button>
+            </div>
+            <div class="history-list" id="history-list"></div>
+            <div class="plagiarism-meter">
+                <div class="meter-label">
+                    <span>AI / Copy Suspicion</span>
+                    <span id="suspicion-val">0%</span>
+                </div>
+                <div class="score-bar-bg" style="height: 4px;">
+                    <div id="suspicion-bar" class="score-bar-fill" style="width: 0%; background: var(--success);"></div>
+                </div>
+            </div>
+        </aside>
+
+        <main id="workspace">
+            <section id="left-panel">
+                <div class="panel-toolbar">
+                    <div class="toolbar-title">Source Code</div>
+                    <div class="toolbar-actions">
+                        <button class="btn btn-secondary" id="btn-paste" style="padding: 4px 8px; font-size: 11px;">Paste</button>
+                        <button class="btn btn-secondary" id="btn-clear" style="padding: 4px 8px; font-size: 11px;">Clear</button>
+                    </div>
+                </div>
+                <div class="editor-container">
+                    <div class="line-numbers" id="line-numbers">1</div>
+                    <div class="code-area">
+                        <textarea id="code-input" spellcheck="false" placeholder="// Paste or type your code here..."></textarea>
+                        <pre class="highlight-layer" aria-hidden="true"><code id="code-highlight" class="language-javascript"></code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="right-panel">
+                <div class="tabs">
+                    <button class="tab active" data-tab="bug">🐛 Bug Hunter</button>
+                    <button class="tab" data-tab="security">🔒 Security Scan</button>
+                    <button class="tab" data-tab="quality">⚡ Code Quality</button>
+                    <button class="tab" data-tab="architecture">🗺️ Architecture</button> <button class="tab" data-tab="optimize">✨ Optimize</button>
+                </div>
+                <div class="panel-toolbar" style="border-top: 1px solid var(--border); border-bottom: none; height: 36px;">
+                    <div class="toolbar-title" id="results-title">Analysis Results</div>
+                    <div class="toolbar-actions">
+                        <button class="icon-btn" id="btn-copy-md" title="Copy Markdown">Copy</button>
+                        <button class="icon-btn" id="btn-print" title="Download PDF Report">Print</button>
+                    </div>
+                </div>
+                <div id="results-content" class="markdown-body">
+                    <div class="empty-state">
+                        <h3>Ready for Review</h3>
+                        <p style="font-size: 13px; margin-top: 8px;">Paste code and hit a tab to scan with Gemini Free Tier.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer id="status-bar">
+        <div class="status-left">
+            <span><span id="char-count">0</span> chars</span>
+            <span><span id="line-count">0</span> lines</span>
+            <span id="detected-lang" style="color: var(--primary);">Lang: Auto</span>
+        </div>
+        <div class="status-right">
+            <div style="display: flex; align-items: center;">
+                <span class="status-indicator" id="api-indicator"></span>
+                <span id="api-status">Idle</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
